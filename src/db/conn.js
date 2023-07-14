@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
-
-mongoose.connect("mongodb://localhost:27017/RestoManagement",{
+const dotenv = require("dotenv");
+dotenv.config({path:'./config.env'});
+mongoose.connect(`${process.env.db}`,{
     useNewUrlParser:true
 }).then(()=>{
     console.log("connection Successfull");
