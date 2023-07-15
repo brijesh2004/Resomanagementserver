@@ -51,6 +51,7 @@ app.get("/navbar",authenticate , async (req,res)=>{
 }) 
 
 app.post("/register" , async (req,res)=>{
+  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
   try{
   const {name,email ,password,cpassword} = req.body;
   console.log(name,email ,password,cpassword);
@@ -90,7 +91,6 @@ app.post('/login' , async (req,res)=>{
      console.log(isMatch);
      const token = await userExist.autogeneratetoken();
      console.log(token);
-
      // cookie store  
      res.cookie("jwttoken", token, {
        expires: new Date(Date.now() + 25892000000),
@@ -105,11 +105,11 @@ app.post('/login' , async (req,res)=>{
      }
     }
     else{
-      res.status(402).json({err:"wrong details"});
+      res.status(401).json({err:"wrong details"});
     }
   }
   catch(err){
-    res.status(403).json({err:"Wrong details"})
+    res.status(401).json({err:"Wrong details"})
   }
 
 })
