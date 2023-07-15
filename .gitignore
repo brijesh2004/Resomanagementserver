@@ -1,4 +1,4 @@
-/node_modules
+
 confi.env
 .DS_Store
 .env.local
