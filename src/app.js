@@ -76,6 +76,7 @@ catch(err){
 })
 
 app.post('/login' , async (req,res)=>{
+  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
   try{
     const {email , password} = req.body;
     console.log(email , password);
