@@ -23,7 +23,7 @@ app.use(
     cors({
       credentials:true,
     //   origin:[`${process.env.PATH}`],
-    origin:[process.env.origin],
+    origin:['https://restoclient.onrender.com'],
       methods:['GET','POST','DELETE'],
       allowedHeaders: ["Content-Type", "Authorization"]
     })
@@ -34,12 +34,15 @@ app.get("/",(req,res)=>{
 })
 
 app.get('/breakfast',(req,res)=>{
+  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
     res.send(breakfast);
 })
 app.get('/lunch',(req,res)=>{
+  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
     res.send(lunch);
 })
 app.get('/dinner',(req,res)=>{
+  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
     res.send(dinner);
 })
 
