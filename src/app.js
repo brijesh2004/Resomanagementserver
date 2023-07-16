@@ -23,7 +23,7 @@ app.use(
     cors({
       credentials:true,
     //   origin:[`${process.env.PATH}`],
-    origin:['https://restoclient.onrender.com'],
+    origin:['https://restoclient.onrender.com/'],
       methods:['GET','POST','DELETE'],
       allowedHeaders: ["Content-Type", "Authorization"]
     })
@@ -34,15 +34,15 @@ app.get("/",(req,res)=>{
 })
 
 app.get('/breakfast',(req,res)=>{
-  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
+  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com/`);
     res.send(breakfast);
 })
 app.get('/lunch',(req,res)=>{
-  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
+  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com/`);
     res.send(lunch);
 })
 app.get('/dinner',(req,res)=>{
-  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
+  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com/`);
     res.send(dinner);
 })
 
@@ -51,7 +51,7 @@ app.get("/navbar",authenticate , async (req,res)=>{
 }) 
 
 app.post("/register" , async (req,res)=>{
-  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
+  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com/`);
   try{
   const {name,email ,password,cpassword} = req.body;
   console.log(name,email ,password,cpassword);
@@ -77,7 +77,7 @@ catch(err){
 })
 
 app.post('/login' , async (req,res)=>{
-  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
+  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com/`);
   try{
     const {email , password} = req.body;
     console.log(email , password);
@@ -94,7 +94,9 @@ app.post('/login' , async (req,res)=>{
      // cookie store  
      res.cookie("jwttoken", token, {
        expires: new Date(Date.now() + 25892000000),
-       httpOnly: true
+       httpOnly: true,
+       sameSite:'none', 
+       secure:true
      });
 
      if(isMatch){
