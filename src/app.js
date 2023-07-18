@@ -22,7 +22,7 @@ app.use(cookieParser());
 app.use(
     cors({
       credentials:true,
-      origin:['http://https://restoclient.onrender.com'],
+      origin:['https://restoclient.onrender.com'],
       methods:['GET','POST','DELETE'],
       allowedHeaders: ["Content-Type", "Authorization"]
     })
@@ -33,25 +33,25 @@ app.get("/",(req,res)=>{
 })
 
 app.get('/breakfast',(req,res)=>{
-  res.header('Access-Control-Allow-Origin', `http://https://restoclient.onrender.com`);
+  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
     res.send(breakfast);
 })
 app.get('/lunch',(req,res)=>{
-  res.header('Access-Control-Allow-Origin', `http://https://restoclient.onrender.com`);
+  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
     res.send(lunch);
 })
 app.get('/dinner',(req,res)=>{
-  res.header('Access-Control-Allow-Origin', `http://https://restoclient.onrender.com`);
+  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
     res.send(dinner);
 })
 
 app.get("/navbar",authenticate , async (req,res)=>{
-  res.header('Access-Control-Allow-Origin', `http://https://restoclient.onrender.com`);
+  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
    res.send(req.rootUser);
 }) 
 
 app.post("/register" , async (req,res)=>{
-  res.header('Access-Control-Allow-Origin', `http://https://restoclient.onrender.com`);
+  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
   try{
   const {name,email ,password,cpassword} = req.body;
   // console.log(name,email ,password,cpassword);
@@ -77,7 +77,7 @@ catch(err){
 })
 
 app.post('/login' , async (req,res)=>{
-  res.header('Access-Control-Allow-Origin', `http://https://restoclient.onrender.com`);
+  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
   try{
     const {email , password} = req.body;
     // console.log(email , password);
