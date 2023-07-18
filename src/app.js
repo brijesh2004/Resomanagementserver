@@ -22,7 +22,7 @@ app.use(cookieParser());
 app.use(
     cors({
       credentials:true,
-      origin:['https://restoclient.onrender.com'],
+      origin:['http://https://restoclient.onrender.com'],
       methods:['GET','POST','DELETE'],
       allowedHeaders: ["Content-Type", "Authorization"]
     })
@@ -33,28 +33,28 @@ app.get("/",(req,res)=>{
 })
 
 app.get('/breakfast',(req,res)=>{
-  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
+  res.header('Access-Control-Allow-Origin', `http://https://restoclient.onrender.com`);
     res.send(breakfast);
 })
 app.get('/lunch',(req,res)=>{
-  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
+  res.header('Access-Control-Allow-Origin', `http://https://restoclient.onrender.com`);
     res.send(lunch);
 })
 app.get('/dinner',(req,res)=>{
-  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
+  res.header('Access-Control-Allow-Origin', `http://https://restoclient.onrender.com`);
     res.send(dinner);
 })
 
 app.get("/navbar",authenticate , async (req,res)=>{
-  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
+  res.header('Access-Control-Allow-Origin', `http://https://restoclient.onrender.com`);
    res.send(req.rootUser);
 }) 
 
 app.post("/register" , async (req,res)=>{
-  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
+  res.header('Access-Control-Allow-Origin', `http://https://restoclient.onrender.com`);
   try{
   const {name,email ,password,cpassword} = req.body;
-  console.log(name,email ,password,cpassword);
+  // console.log(name,email ,password,cpassword);
   if(!name || !email || !password || !cpassword){
     res.status(401).json({err:"please fill all the filled"});
   }
@@ -77,20 +77,20 @@ catch(err){
 })
 
 app.post('/login' , async (req,res)=>{
-  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
+  res.header('Access-Control-Allow-Origin', `http://https://restoclient.onrender.com`);
   try{
     const {email , password} = req.body;
-    console.log(email , password);
+    // console.log(email , password);
     if(!email || !password){
       res.status(422).json({err:"please fill the field"});
     }
     const userExist = await User.findOne({email});
-    console.log("use", userExist);
+    // console.log("use", userExist);
     if(userExist){
      const isMatch = await bcrypt.compare(password , userExist.password);
-     console.log(isMatch);
+    //  console.log(isMatch);
      const token = await userExist.autogeneratetoken();
-     console.log(token);
+    //  console.log(token);
      // cookie store  
      res.cookie("jwttoken", token, {
        expires: new Date(Date.now() + 25892000000),
@@ -136,6 +136,46 @@ catch(err){
   res.status(401).json({err:"Please Enter the Email"});
 }
 
+})
+
+app.post("/ordernow" ,authenticate ,async (req,res)=>{
+  try{
+    const {name , price,mobile1,mobile2,address , pincode} = req.body;
+    // console.log(name , price ,mobile1 , mobile2,address , pincode);
+    if(!name || !price || !mobile1 ||!mobile2||!address||!pincode){
+      res.status(401).json({err:"Please fill the the field"});
+    }
+    else{
+      const UserFind = await User.findOne({_id:req.userID});
+      if(!UserFind){
+        res.status(402).json({err:"Please Login First"});
+      }
+      else{
+        const Userorder = await UserFind.addOrder(name,price ,mobile1,mobile2,address,pincode);
+        await UserFind.save();
+        res.status(201).json({mess:"Order Booked Successfully"});
+      }
+    }
+
+  }
+  catch(err){
+    res.status.json({err:"error occured"});
+  }
+ 
+
+})
+
+
+app.get('/logout', (req, res) => {
+  try{
+    // console.log("hello my logout page");
+    res.clearCookie('jwttoken',{path:'/'})
+    res.status(200).json({mess:"user logout"});
+  }
+  catch(err){
+    res.status(401).json({err:"Cookies not Clear"});
+  }
+ 
 })
 app.listen(port,()=>{
     console.log(`Server is listening on the port number ${port}`);
