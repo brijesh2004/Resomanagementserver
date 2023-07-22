@@ -13,6 +13,9 @@ const UserSchema = new mongoose.Schema({
         type:String,
         required:true
     },
+    photo:{
+        type:String,
+    },
     password:{
         type:String,
         required:true
@@ -54,6 +57,10 @@ const UserSchema = new mongoose.Schema({
            pincode:{
             type:Number,
             required:true
+           },
+           date:{
+            type:Date,
+            default:new Date()
            }
         }
     ]
@@ -90,7 +97,16 @@ UserSchema.methods.addOrder = async function(name,price,mobile1,mobile2,address,
         console.log(err);
     }
 }
-
+UserSchema.methods.addProfileImage = async function(photo){
+    try{
+        this.photo = photo;
+        await this.save();
+        return this;
+    }
+    catch(err){
+        console.log(err);
+    }
+}
 const User = mongoose.model('user',UserSchema);
 
 module.exports = User;

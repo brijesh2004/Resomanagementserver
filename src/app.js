@@ -8,12 +8,16 @@ const cookieParser = require('cookie-parser');
 const bcrypt = require("bcryptjs");
 const User = require("../src/models/schema");
 const DailyUpdate = require("../src/models/dailymess");
+const updateOrder = require('../src/models/ordersschema');
 const authenticate = require("./middleware/authenticate");
 dotenv.config({path:'./config.env'});
 const port = process.env.PORT || 6000;
 
 
+
 const app = express();
+app.use(express.json({limit:'50mb'}));
+app.use(express.urlencoded({ extended: false }));
 require("../src/db/conn");
 app.use(express.json());
 app.use(cookieParser());
@@ -153,6 +157,8 @@ app.post("/ordernow" ,authenticate ,async (req,res)=>{
       else{
         const Userorder = await UserFind.addOrder(name,price ,mobile1,mobile2,address,pincode);
         await UserFind.save();
+         const order =await new updateOrder({name , price ,mobile1,mobile2,address,pincode });
+         await order.save(0);
         res.status(201).json({mess:"Order Booked Successfully"});
       }
     }
@@ -177,6 +183,39 @@ app.get('/logout', (req, res) => {
   }
  
 })
+app.get("/profiledata",authenticate , async (req,res)=>{
+  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
+   res.send(req.rootUser);
+}) 
+
+app.post("/profilephoto" , authenticate , async (req,res) =>{
+  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
+  try{
+    const {photo} = req.body;
+    // console.log(photo);
+    if(!photo){
+      console.log("error");
+      res.status(401).json({err:"Error on photo"});
+    }
+    else{
+      const UserFind = await User.findOne({_id:req.userID});
+      await UserFind.addProfileImage(photo);
+      await UserFind.save();
+      res.status(201).json({mess:"profile uplaoded successfully"})
+    }
+  }
+  catch(err){
+    //  console.log(err);
+     console.log("error on catch");
+    res.status(401).json({err:"Error"});
+  }
+})
+
+app.get("/gettheorder" ,async (req,res)=>{
+ const data = await updateOrder.find({});
+ res.send(data);
+});
+
 app.listen(port,()=>{
     console.log(`Server is listening on the port number ${port}`);
 })
