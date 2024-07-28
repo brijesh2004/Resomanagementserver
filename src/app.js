@@ -10,8 +10,9 @@ const User = require("../src/models/schema");
 const DailyUpdate = require("../src/models/dailymess");
 const updateOrder = require('../src/models/ordersschema');
 const authenticate = require("./middleware/authenticate");
-dotenv.config({path:'./config.env'});
+dotenv.config();
 const port = process.env.PORT || 6000;
+
 
 
 
@@ -26,67 +27,61 @@ app.use(cookieParser());
 app.use(
     cors({
       credentials:true,
-      origin:['https://restoclient.onrender.com'],
+      origin:[`${process.env.FRONTEND}`],
       methods:['GET','POST','DELETE'],
       allowedHeaders: ["Content-Type", "Authorization"]
     })
   )
 
 app.get("/",(req,res)=>{
-    res.send("hello World");
+    return res.send("hello World");
 })
 
 app.get('/breakfast',(req,res)=>{
-  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
-    res.send(breakfast);
+    return res.send(breakfast);
 })
 app.get('/lunch',(req,res)=>{
-  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
-    res.send(lunch);
+    return res.send(lunch);
 })
 app.get('/dinner',(req,res)=>{
-  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
-    res.send(dinner);
+   return res.send(dinner);
 })
 
 app.get("/navbar",authenticate , async (req,res)=>{
-  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
-   res.send(req.rootUser);
+   return res.send(req.rootUser);
 }) 
 
 app.post("/register" , async (req,res)=>{
-  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
   try{
   const {name,email ,password,cpassword} = req.body;
   // console.log(name,email ,password,cpassword);
   if(!name || !email || !password || !cpassword){
-    res.status(401).json({err:"please fill all the filled"});
+    return res.status(401).json({err:"please fill all the filled"});
   }
      const userexist =await User.findOne({email:email});
      if(userexist){
-      res.status(422).json({err:"Already Registered"});
+      return res.status(422).json({err:"Already Registered"});
      }
      else if(password!==cpassword){
-      res.status(421).json({err:"password are not matching"});
+     return res.status(421).json({err:"password are not matching"});
      }
      else{
       const newUser = await new User({name,email,password , cpassword});
       await newUser.save();
-      res.status(201).send({mess:"User Register Successfully"});
+      return res.status(201).send({mess:"User Register Successfully"});
      }
 }
 catch(err){
-  res.status(401).json({err:"Error occured"});
+  return res.status(401).json({err:"Error occured"});
 }
 })
 
 app.post('/login' , async (req,res)=>{
-  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
   try{
     const {email , password} = req.body;
     // console.log(email , password);
     if(!email || !password){
-      res.status(422).json({err:"please fill the field"});
+     return res.status(422).json({err:"please fill the field"});
     }
     const userExist = await User.findOne({email});
     // console.log("use", userExist);
@@ -104,18 +99,18 @@ app.post('/login' , async (req,res)=>{
      });
 
      if(isMatch){
-      res.status(200).json({mess:"Login successfully"});
+     return res.status(200).json({mess:"Login successfully"});
      }
      else{
-      res.status(401).json({err:"wrong details"});
+     return res.status(401).json({err:"wrong details"});
      }
     }
     else{
-      res.status(401).json({err:"wrong details"});
+      return res.status(401).json({err:"wrong details"});
     }
   }
   catch(err){
-    res.status(401).json({err:"Wrong details"})
+    return res.status(401).json({err:"Wrong details"})
   }
 
 })
@@ -124,20 +119,20 @@ app.post("/getnewsdaily" , async(req, res)=>{
   try{
   const {email} = req.body;
   if(!email){
-    res.status(401).json({err:"Please Enter the Email"});
+   return res.status(401).json({err:"Please Enter the Email"});
   }
   else{
     const findEmail = await DailyUpdate.findOne({email:email});
     if(findEmail){
-      res.status(402).json({err:"Already get News"});
+      return res.status(402).json({err:"Already get News"});
     }
     const newEmailAdded = new DailyUpdate({email});
     await newEmailAdded.save();
-    res.status(201).send({mess:"thanks for subscribing "});
+   return res.status(201).send({mess:"thanks for subscribing "});
   }
 }
 catch(err){
-  res.status(401).json({err:"Please Enter the Email"});
+  return res.status(401).json({err:"Please Enter the Email"});
 }
 
 })
@@ -152,68 +147,74 @@ app.post("/ordernow" ,authenticate ,async (req,res)=>{
     else{
       const UserFind = await User.findOne({_id:req.userID});
       if(!UserFind){
-        res.status(402).json({err:"Please Login First"});
+        return res.status(402).json({err:"Please Login First"});
       }
       else{
         const Userorder = await UserFind.addOrder(name,price ,mobile1,mobile2,address,pincode);
         await UserFind.save();
-         const order =await new updateOrder({name , price ,mobile1,mobile2,address,pincode });
+        const name1 = UserFind.name;
+         const order =await new updateOrder({name1 , name , price ,mobile1,mobile2,address,pincode });
          await order.save(0);
-        res.status(201).json({mess:"Order Booked Successfully"});
+       return res.status(201).json({mess:"Order Booked Successfully"});
       }
     }
 
   }
   catch(err){
-    res.status.json({err:"error occured"});
+    return res.status.json({err:"error occured"});
   }
  
 
 })
 
 
-app.get('/logout', (req, res) => {
+app.get('/logout', async (req, res) => {
   try{
-    // console.log("hello my logout page");
-    res.clearCookie('jwttoken',{path:'/'})
-    res.status(200).json({mess:"user logout"});
+    console.log("hello my logout page");
+    res.cookie("jwttoken", '', {
+      expires: 0,
+      httpOnly: true,
+      sameSite:'none', 
+      secure:true
+    });
+    console.log("Hello");
+    return res.status(200).json({mess:"user logout"});
   }
   catch(err){
-    res.status(401).json({err:"Cookies not Clear"});
+    console.log("Hello1" , err);
+   return res.status(401).json({err:"Cookies not Clear"});
   }
  
 })
 app.get("/profiledata",authenticate , async (req,res)=>{
-  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
-   res.send(req.rootUser);
+   return res.send(req.rootUser);
 }) 
 
 app.post("/profilephoto" , authenticate , async (req,res) =>{
-  res.header('Access-Control-Allow-Origin', `https://restoclient.onrender.com`);
   try{
     const {photo} = req.body;
     // console.log(photo);
     if(!photo){
       console.log("error");
-      res.status(401).json({err:"Error on photo"});
+     return res.status(401).json({err:"Error on photo"});
     }
     else{
       const UserFind = await User.findOne({_id:req.userID});
       await UserFind.addProfileImage(photo);
       await UserFind.save();
-      res.status(201).json({mess:"profile uplaoded successfully"})
+      return res.status(201).json({mess:"profile uplaoded successfully"})
     }
   }
   catch(err){
     //  console.log(err);
      console.log("error on catch");
-    res.status(401).json({err:"Error"});
+   return res.status(401).json({err:"Error"});
   }
 })
 
 app.get("/gettheorder" ,async (req,res)=>{
  const data = await updateOrder.find({});
- res.send(data);
+return res.send(data);
 });
 
 app.listen(port,()=>{
