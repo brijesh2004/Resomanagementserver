@@ -29,7 +29,7 @@ visit the frontend part
 <hr>
 <h1>Technology Used</h1>
  <ul>
-    <li><b> Frontend :</b>Built with React and Vite, utilizing TypeScript to deliver a smooth and interactive user experience.</li>
+    <li><b> Frontend :</b>Built with React to deliver a smooth and interactive user experience.</li>
     <li><b> Backend :</b> Powered by Express.js, providing a robust and scalable server-side architecture </li>
     <li><b> Database :</b> Leveraging MongoDB, a NoSQL database, for flexible and efficient data storage and retrieval. </li>
     <li><b> Authentication :</b> Implemented using JSON Web Token (JWT) to ensure secure, stateless user sessions.. </li>
