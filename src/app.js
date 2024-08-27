@@ -23,7 +23,6 @@ require("../src/db/conn");
 app.use(express.json());
 app.use(cookieParser());
 //  const apiPath = path.join(__dirname,".././api");
-//  console.log(apiPath);
 app.use(
     cors({
       credentials:true,
@@ -54,7 +53,6 @@ app.get("/navbar",authenticate , async (req,res)=>{
 app.post("/register" , async (req,res)=>{
   try{
   const {name,email ,password,cpassword} = req.body;
-  // console.log(name,email ,password,cpassword);
   if(!name || !email || !password || !cpassword){
     return res.status(401).json({err:"please fill all the filled"});
   }
@@ -79,17 +77,13 @@ catch(err){
 app.post('/login' , async (req,res)=>{
   try{
     const {email , password} = req.body;
-    // console.log(email , password);
     if(!email || !password){
      return res.status(422).json({err:"please fill the field"});
     }
     const userExist = await User.findOne({email});
-    // console.log("use", userExist);
     if(userExist){
      const isMatch = await bcrypt.compare(password , userExist.password);
-    //  console.log(isMatch);
      const token = await userExist.autogeneratetoken();
-    //  console.log(token);
      // cookie store  
      res.cookie("jwttoken", token, {
        expires: new Date(Date.now() + 25892000000),
@@ -115,6 +109,8 @@ app.post('/login' , async (req,res)=>{
 
 })
 
+
+
 app.post("/getnewsdaily" , async(req, res)=>{
   try{
   const {email} = req.body;
@@ -134,54 +130,40 @@ app.post("/getnewsdaily" , async(req, res)=>{
 catch(err){
   return res.status(401).json({err:"Please Enter the Email"});
 }
-
 })
 
-app.post("/ordernow" ,authenticate ,async (req,res)=>{
-  try{
-    const {name , price,mobile1,mobile2,address , pincode} = req.body;
-    // console.log(name , price ,mobile1 , mobile2,address , pincode);
-    if(!name || !price || !mobile1 ||!mobile2||!address||!pincode){
-      res.status(401).json({err:"Please fill the the field"});
-    }
-    else{
-      const UserFind = await User.findOne({_id:req.userID});
-      if(!UserFind){
-        return res.status(402).json({err:"Please Login First"});
-      }
-      else{
-        const Userorder = await UserFind.addOrder(name,price ,mobile1,mobile2,address,pincode);
-        await UserFind.save();
-        const name1 = UserFind.name;
-         const order =await new updateOrder({name1 , name , price ,mobile1,mobile2,address,pincode });
-         await order.save(0);
-       return res.status(201).json({mess:"Order Booked Successfully"});
-      }
-    }
 
+
+app.post("/order" , authenticate ,async (req , res)=>{
+  try{
+    const {name , table , cart} = req.body;
+    const orderedBy= req.userID;
+    const newOrder = new updateOrder({
+      name , 
+      table,
+      orderedBy,
+      cart
+    })
+    await newOrder.save();
+   return res.status(201).json({mess:"Ordered!"})
   }
   catch(err){
-    return res.status.json({err:"error occured"});
+    return res.status(400).json({err:"Error Occured"});
   }
- 
-
 })
 
 
 app.get('/logout', async (req, res) => {
   try{
-    console.log("hello my logout page");
     res.cookie("jwttoken", '', {
       expires: 0,
       httpOnly: true,
       sameSite:'none', 
       secure:true
     });
-    console.log("Hello");
     return res.status(200).json({mess:"user logout"});
   }
   catch(err){
-    console.log("Hello1" , err);
    return res.status(401).json({err:"Cookies not Clear"});
   }
  
@@ -193,9 +175,7 @@ app.get("/profiledata",authenticate , async (req,res)=>{
 app.post("/profilephoto" , authenticate , async (req,res) =>{
   try{
     const {photo} = req.body;
-    // console.log(photo);
     if(!photo){
-      console.log("error");
      return res.status(401).json({err:"Error on photo"});
     }
     else{
@@ -206,15 +186,19 @@ app.post("/profilephoto" , authenticate , async (req,res) =>{
     }
   }
   catch(err){
-    //  console.log(err);
-     console.log("error on catch");
    return res.status(401).json({err:"Error"});
   }
 })
 
-app.get("/gettheorder" ,async (req,res)=>{
- const data = await updateOrder.find({});
-return res.send(data);
+app.get("/gettheorder" ,authenticate ,async (req,res)=>{
+  try{
+    const id = req.userID;
+    const data = await updateOrder.find({orderedBy:id});
+   return res.status(200).json({mess:data});
+  }
+  catch(err){
+    return res.status(400).json({err:"Error"});
+  }
 });
 
 app.listen(port,()=>{

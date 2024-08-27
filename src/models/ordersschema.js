@@ -1,38 +1,44 @@
 const mongoose = require("mongoose");
 
 const OrdersSchema = new mongoose.Schema({
-    name1:{
+   name:{
+    type:String,
+    required:[true , 'please Provide the Name']
+   },
+   table:{
+    type:String,
+    required:[true,'Please Provide the Table Id']
+   },
+   orderedBy:{
+    type:String,
+    required:true,
+   },
+   orderedAt:{
+    type:Date,
+    default:Date.now
+   },
+   cart:[{
+     name:{
       type:String,
       required:true
-    },
-    name:{
-        type:String ,
-        required:true
-       },
-       price:{
-        type:Number,
-        required:true
-       },
-       mobile1:{
-        type:Number,
-        required:true
-       },
-       mobile2:{
-        type:Number,
-        required:true
-       },
-       address:{
-        type:String,
-        required:true
-       },
-       pincode:{
-        type:Number,
-        required:true
-       },
-       date:{
-        type:Date,
-        default:new Date()
-       }
+     },
+     price:{
+      type:String,
+      required:true
+     },
+     numberOf:{
+      type:Number,
+      required:true
+     },
+     id:{
+      type:String,
+      required:true,
+     },
+     image:{
+      type:String,
+      required:true
+     }
+   }]
 })
 
 

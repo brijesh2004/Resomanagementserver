@@ -31,38 +31,6 @@ const UserSchema = new mongoose.Schema({
                 required:true
             }
         }
-    ],
-    orders:[
-        {
-           name:{
-            type:String ,
-            required:true
-           },
-           price:{
-            type:Number,
-            required:true
-           },
-           mobile1:{
-            type:Number,
-            required:true
-           },
-           mobile2:{
-            type:Number,
-            required:true
-           },
-           address:{
-            type:String,
-            required:true
-           },
-           pincode:{
-            type:Number,
-            required:true
-           },
-           date:{
-            type:Date,
-            default:new Date()
-           }
-        }
     ]
 })
 
@@ -88,15 +56,15 @@ UserSchema.methods.autogeneratetoken = async function(){
     }
 }
 
-UserSchema.methods.addOrder = async function(name,price,mobile1,mobile2,address,pincode){
-    try{
-        this.orders = this.orders.concat({name , price,mobile1,mobile2,address,pincode});
-        await this.save();
-        return {name,price,mobile1,mobile2,address,pincode};
-    }catch(err){
-        console.log(err);
-    }
-}
+// UserSchema.methods.addOrder = async function(name,price,mobile1,mobile2,address,pincode){
+//     try{
+//         this.orders = this.orders.concat({name , price,mobile1,mobile2,address,pincode});
+//         await this.save();
+//         return {name,price,mobile1,mobile2,address,pincode};
+//     }catch(err){
+//         console.log(err);
+//     }
+// }
 UserSchema.methods.addProfileImage = async function(photo){
     try{
         this.photo = photo;
