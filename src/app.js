@@ -26,9 +26,9 @@ app.use(cookieParser());
 app.use(
     cors({
       credentials:true,
-      origin:[`${process.env.FRONTEND}`],
+      origin:[`*`],
       methods:['GET','POST','DELETE'],
-      allowedHeaders: ["Content-Type", "Authorization"]
+      allowedHeaders: ["Content-Type", "Authorization" , 'x-access-token']
     })
   )
 
@@ -64,9 +64,17 @@ app.post("/register" , async (req,res)=>{
      return res.status(421).json({err:"password are not matching"});
      }
      else{
-      const newUser = await new User({name,email,password , cpassword});
+      const newUser = new User({name,email,password , cpassword});
       await newUser.save();
-      return res.status(201).send({mess:"User Register Successfully"});
+      const token = await newUser.autogeneratetoken();
+     // cookie store  
+     res.cookie("jwttoken", token, {
+       expires: new Date(Date.now() + 25892000000),
+       httpOnly: true,
+       sameSite:'none', 
+       secure:true
+     });
+      return res.status(201).send({mess:"User Register Successfully" , token:token});
      }
 }
 catch(err){
@@ -93,7 +101,7 @@ app.post('/login' , async (req,res)=>{
      });
 
      if(isMatch){
-     return res.status(200).json({mess:"Login successfully"});
+     return res.status(200).json({mess:"Login successfully" , token:token});
      }
      else{
      return res.status(401).json({err:"wrong details"});

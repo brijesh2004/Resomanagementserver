@@ -5,7 +5,7 @@ dotenv.config({path:'./config.env'});
 
 const authenticate = async (req,res,next) => {
     try{
-    const token = req.cookies.jwttoken;
+    const token = req.cookies.jwttoken||req.headers['x-access-token'];
     const verifyToken = jwt.verify(token,"thisistherestomanagementsystemappdesignusingmern");
 
     const rootUser = await User.findOne({_id:verifyToken._id , "tokens.token":token});

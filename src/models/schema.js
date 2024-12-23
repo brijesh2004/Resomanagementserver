@@ -47,7 +47,7 @@ UserSchema.pre('save' , async function(next){
 UserSchema.methods.autogeneratetoken = async function(){
     try{
         let token = jwt.sign({_id: this._id} , "thisistherestomanagementsystemappdesignusingmern");
-        // console.log("key->" , process.env.SECRETE_KEY);
+        
         this.tokens = this.tokens.concat({token:token});
         await this.save();
         return token;
