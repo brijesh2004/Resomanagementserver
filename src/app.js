@@ -26,7 +26,7 @@ app.use(cookieParser());
 app.use(
     cors({
       credentials:true,
-      origin:[`*`],
+      origin:`${process.env.FRONTEND}`||'*',
       methods:['GET','POST','DELETE'],
       allowedHeaders: ["Content-Type", "Authorization" , 'x-access-token']
     })
